@@ -1,0 +1,299 @@
+// // const express=require('express')
+// // const app=express();
+// // const PORT=8080;
+
+// // // console.log(app);
+
+// // // // method used for fetching data
+// // // app.get('/',(req,res)=> res.send("This is home page"));
+
+// // // app.get('/user', (req, res) => {
+// // //     console.log("User route accessed!");  // Debugging
+// // //     let user = {
+// // //         name: "bsraj",
+// // //         age: 28,
+// // //         email: "bsraj88",
+// // //         city: "jaipur"
+// // //     };
+// // //     res.send(user);
+// // // });
+
+
+
+// // app.get('/',(req,res)=> res.send("This is home page"));
+
+
+
+// // // method used for fetching data
+// // app.get('/',(req,res)=> res.send("This is home page"));
+
+
+
+
+// // //  method used for creating data
+// // app.post('/',(req,res) => {
+
+// // })
+
+// // //  method used for update data
+// // app.put('/:id',(req,res)=> {
+
+
+// // })
+
+// // //  method used for deleting data
+// // app.delete('/:id',(req,res)=> {
+
+    
+// // })
+
+
+
+// // app.listen(PORT,()=>  console.log(`server is running on port okay ${PORT}`));
+
+
+
+
+// const express = require('express');
+// const app = express()
+// require("dotenv").config();
+// const db=require('./db')
+
+
+
+// app.use(express.json())
+
+
+
+// const port = process.env.PORT || 3000;
+
+// const users = [
+//   {
+//     id: 1,
+//     name: "samir",
+//     email: "samir@gamil.com",
+//   },
+//   {
+//     id: 2,
+//     name: "rahul",
+//     email: "rahul@gamil.com",
+//   },
+// ];
+
+// app.get("/", (req, res) => {
+//     res.send('hello node')
+// })
+
+// app.get('/users',(req,res)=>{
+// res.send(users)
+// })
+
+// app.get("/users/:id", (req, res) => {
+//   const userId = parseInt(req.params.id);
+//   const user = users.find((u) => u.id === userId);
+//     if (user) {
+//       res.send(user);
+//     } else {
+//       res.status(404).send({ message: "User not found" });
+//     }
+// });
+
+
+// app.post("/users", (req, res) => {
+//   const { name, email } = req.body;
+//   if (!name || !email) {
+//     return res.status(400).json({
+//       message: "Name and eamil is require "
+//     })
+//   }
+
+//   const newUser = {
+//     id: users.length + 1,
+//     name,
+//     email
+//   }
+
+
+//   users.push(newUser);
+//   res.status(201).json(newUser)
+// })
+
+
+// //Update
+
+// app.put('/users/:id', (req, res) => {
+//   const userId = parseInt(req.params.id);
+//   const { name, email } = req.body;
+
+//   let user = users.find((u) => {
+//     return u.id === userId
+//   });
+//   if (!user) {
+//     return res.status(404).json({
+//       message:'User not found'
+//     })
+//   }
+
+//   user.name = name;
+//   user.email = email;
+
+//   res.json(user);
+// })
+
+
+// //delete
+
+// app.delete("/users/:id", (req, res) => {
+//   const userId = parseInt(req.params.id)
+    
+//   let userIndex = users.findIndex((u) => u.id === userId);
+
+//   if (userIndex === -1) {
+//     return res.status(404).json({
+//       message: "User not found",
+//     });
+//   }
+
+//   users.splice(userIndex, 1);
+//   res.status(200).json({
+//     message: "User deleted successfully",
+//   });
+// })
+
+
+
+
+// app.listen(port, () => {
+//   console.log(`server is running on port:${port}`)
+  
+// })
+
+
+
+//.................................. // "type": "module" ///////json mai jab react ki trh use le to es module
+// //   export default users;  // react wala
+// // import express, { json } from 'express';
+// const app = express()
+// require("dotenv").config();
+// import db from './db';      // react ki trh tab usse lena
+
+
+
+// auths
+
+const express=require('express')
+const route = express.Router();
+const Developer=require('../models/developer')
+// const passport = require('../auth');
+
+// const authmid = passport.authenticate('local', {session:false})
+
+
+//create developer
+route.post('/', async (req,res) => {
+    try {
+        
+        const data = req.body;
+
+        const newDeveloper= new Developer(data);
+
+        const response = await newDeveloper.save();
+
+        console.log("Data saved!");
+
+        res.status(200).json(response)
+        
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({msg:"Interval server error"});
+    }
+})
+
+
+
+
+// get all the developers
+route.get('/',async (req,res) => {
+    try {
+        const data= await Developer.find();
+        console.log("Data fetched");
+        res.status(200).json(data);
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({msg:"Interval server error"});
+    }
+})
+
+//get developer by the id
+// route.get('/:id',async (req,res) => {
+    
+
+// })
+
+// get developer by domain
+route.get('/:techType',async (req,res) => {
+    
+   try {
+    const techType= req.params.techType;
+    if(techType === "fullstack" || techType === "frontend" ||techType === "backend" ){
+        const response = await Developer.find({work: techType});
+
+        console.log("Tech type data fetched");
+        res.status(200).json(response)
+    }
+    else {
+        res.status(404).json({msg:"INvalid tech"})
+    }
+   } catch (error) {
+    console.log(error);
+    res.status(500).json({msg:"Interval server error"});
+   } 
+})
+
+// update the developer
+route.put('/:id',async (req,res) => {
+ try {
+    const developerId = req.params.id;
+    const updatedDeveloper = req.body;
+
+    const response = await Developer.findByIdAndUpdate(developerId, updatedDeveloper, {
+        new:true,
+        runValidators:true
+    })
+
+    if(!response){
+        res.status(404).json({msg:"Developer not found"})
+    };
+
+    console.log("Data updated");
+
+    res.status(200).json(response)
+    
+ } catch (error) {
+    console.log(error);
+    res.status(500).json({msg:"Interval server error"});
+ }
+
+})
+
+//delete developer
+route.delete('/:id',async (req,res) => {
+    try {
+        const studentId = req.params.id;
+
+        const response = await Developer.findByIdAndDelete(studentId);
+
+        if(!response){
+            res.status(404).json({msg:"Students not found"})
+        }
+
+        res.status(200).json({msg:"Developer deleted successfully"})
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({msg:"Interval server error"});
+    }
+})
+
+module.exports=route;
